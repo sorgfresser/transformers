@@ -826,12 +826,8 @@ class GPT2Model(GPT2PreTrainedModel):
         if self._attn_implementation == "flash_attention_2":
             attention_mask = attention_mask if (attention_mask is not None and 0 in attention_mask) else None
         elif _use_sdpa:
-            attention_mask = _prepare_4d_causal_attention_mask_for_sdpa(
-                attention_mask=attention_mask,
-                input_shape=(batch_size, input_shape[-1]),
-                inputs_embeds=inputs_embeds,
-                past_key_values_length=past_length,
-            )
+            attention_mask = _prepare_4d_attention_mask_for_sdpa(
+                mask=attention_mask, dtype=inputs_embeds.dtype, tgt_len=input_shape[-1])
         else:
             if attention_mask is not None:
                 # We create a 3D attention mask from a 2D tensor mask.
